@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HW4 — Neural Radiance Fields</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #f7f8fc;
+      --bg2:      #ffffff;
+      --bg3:      #f0f2f7;
+      --border:   #dde1ea;
+      --accent:   #1a6b8a;
+      --accent2:  #c45f0a;
+      --accent3:  #6b35b0;
+      --text:     #1a1d26;
+      --muted:    #6b7280;
+      --mono:     'Source Code Pro', monospace;
+      --sans:     'Nunito Sans', 'Calibri', 'Arial', sans-serif;
+      --serif:    'Nunito Sans', 'Calibri', 'Arial', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--serif);
+      font-size: 16px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+
+    /* ── SUBTLE PATTERN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(26,107,138,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 0; opacity: 1;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 50%, rgba(26,107,138,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 30%, rgba(107,53,176,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(196,95,10,0.05) 0%, transparent 60%);
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(26,107,138,0.3);
+      padding: 0.35rem 1rem;
+      border-radius: 2rem;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero h1 {
+      font-family: var(--sans);
+      font-size: clamp(2.8rem, 8vw, 6rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    .hero h1 span.grad {
+      background: linear-gradient(135deg, #1a6b8a 0%, #6b35b0 50%, #c45f0a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 560px;
+      animation: fadeUp 0.8s 0.2s ease both;
+      margin-bottom: 3rem;
+    }
+
+    .hero-meta {
+      display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .meta-pill {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 1rem;
+      border-radius: 0.3rem;
+      background: var(--bg2);
+    }
+
+    .meta-pill strong { color: var(--text); }
+
+    .scroll-hint {
+      position: absolute; bottom: 2rem;
+      font-family: var(--mono); font-size: 0.7rem;
+      color: var(--muted); letter-spacing: 0.15em;
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      animation: fadeUp 1s 0.6s ease both;
+    }
+
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(247,248,252,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; gap: 0;
+      overflow-x: auto;
+    }
+
+    nav a {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 1rem 1.25rem;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── LAYOUT ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+    /* ── SECTION HEADERS ── */
+    .section {
+      padding-top: 5rem;
+      margin-bottom: 3rem;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, rgba(26,107,138,0.3), transparent);
+    }
+
+    .section-label.orange { color: var(--accent2); }
+    .section-label.orange::after {
+      background: linear-gradient(to right, rgba(196,95,10,0.3), transparent);
+    }
+
+    .section-label.purple { color: var(--accent3); }
+    .section-label.purple::after {
+      background: linear-gradient(to right, rgba(107,53,176,0.3), transparent);
+    }
+
+    .section h2 {
+      font-family: var(--sans);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-intro {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 680px;
+      margin-bottom: 3rem;
+      line-height: 1.8;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover { border-color: rgba(26,107,138,0.25); box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+
+    .card-title {
+      font-family: var(--sans);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .card-title .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .card-title .dot.orange { background: var(--accent2); }
+    .card-title .dot.purple { background: var(--accent3); }
+
+    /* ── ARCHITECTURE TABLE ── */
+    .arch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+
+    .arch-table th {
+      text-align: left;
+      padding: 0.6rem 1rem;
+      background: var(--bg3);
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .arch-table td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .arch-table tr:last-child td { border-bottom: none; }
+
+    .arch-table td:first-child { color: var(--muted); }
+
+    .arch-table td code {
+      background: var(--bg3);
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
+    /* ── IMAGES ── */
+    .img-full {
+      width: 100%;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .img-caption {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.6rem;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .img-wrap { margin-bottom: 1.5rem; }
+
+    /* ── 2-COL GRID ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── GIF SHOWCASE ── */
+    .gif-showcase {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .gif-box {
+      flex: 1; min-width: 200px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .gif-box img {
+      width: 100%;
+      display: block;
+    }
+
+    .gif-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      padding: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── HIGHLIGHT BOX ── */
+    .highlight {
+      border-left: 3px solid var(--accent);
+      background: rgba(26,107,138,0.06);
+      padding: 1rem 1.25rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      font-size: 0.95rem;
+      margin: 1rem 0 1.5rem;
+      line-height: 1.7;
+    }
+
+    .highlight.orange {
+      border-color: var(--accent2);
+      background: rgba(196,95,10,0.06);
+    }
+
+    .highlight.purple {
+      border-color: var(--accent3);
+      background: rgba(107,53,176,0.06);
+    }
+
+    /* ── INLINE CODE ── */
+    code {
+      font-family: var(--mono);
+      font-size: 0.82em;
+      background: var(--bg3);
+      color: var(--accent);
+      padding: 0.1em 0.4em;
+      border-radius: 0.25rem;
+    }
+
+    /* ── PSNR BADGE ── */
+    .psnr-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--mono); font-size: 0.8rem;
+      background: rgba(26,107,138,0.1);
+      border: 1px solid rgba(26,107,138,0.25);
+      color: var(--accent);
+      padding: 0.25rem 0.75rem;
+      border-radius: 2rem;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+
+    /* ── STEPS ── */
+    .steps { counter-reset: step; }
+
+    .step {
+      display: flex; gap: 1.25rem;
+      margin-bottom: 1.5rem;
+      counter-increment: step;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 2rem; height: 2rem;
+      border-radius: 50%;
+      background: rgba(26,107,138,0.08);
+      border: 1px solid rgba(26,107,138,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 0.75rem;
+      color: var(--accent);
+      margin-top: 0.15rem;
+    }
+
+    .step-body { flex: 1; }
+
+    .step-body strong {
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-body p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #c8cdd8, transparent);
+      margin: 4rem 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.2); }
+    }
+
+    /* Scroll-triggered fade-in */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-tag">COMS 4732 · Computer Vision II · Homework 4 . Sanskriti Bansal . sb5215</div>
+  <h1>Neural<br/><span class="grad">Radiance Fields</span></h1>
+  <p class="hero-sub">
+    From fitting a 2D neural field to a single image, to reconstructing a full
+    3D scene from multi-view photographs using NeRF.
+  </p>
+  <div class="hero-meta">
+    <div class="meta-pill"><strong>Part 1</strong> — 2D Neural Field</div>
+    <div class="meta-pill"><strong>Part 2</strong> — 3D NeRF · Lego Scene</div>
+    <div class="meta-pill"><strong>Part 3</strong> — Real-World Capture ✦ Extra Credit</div>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- STICKY NAV -->
+<nav>
+  <a href="#part1">Part 1 — 2D Field</a>
+  <a href="#arch">Architecture</a>
+  <a href="#progression">Progression</a>
+  <a href="#grid">Hyperparams</a>
+  <a href="#part2">Part 2 — NeRF</a>
+  <a href="#rays">Ray Viz</a>
+  <a href="#nerf-train">Training</a>
+  <a href="#novel">Novel View</a>
+  <a href="#part3">Part 3 — Real Data</a>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════════════════════════
+     PART 1
+═══════════════════════════════════════════════════════════ -->
+<div class="section" id="part1">
+  <div class="section-label">Part One</div>
+  <h2>Fit a Neural Field<br/>to a 2D Image</h2>
+  <p class="section-intro">
+    Before tackling 3D, we start with a simpler task: training an MLP to memorize
+    a single image by mapping pixel coordinates <em>(u, v)</em> → <em>(r, g, b)</em>.
+    Sinusoidal positional encoding lets the network represent high-frequency details
+    like fine textures and sharp edges.
+  </p>
+</div>
+
+<!-- ARCHITECTURE -->
+<div id="arch" class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Model Architecture</div>
+    <table class="arch-table">
+      <thead><tr><th>Parameter</th><th>Value</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Positional Encoding levels L</td><td><code>10</code></td><td>Maps 2D coord → 42-dim vector</td></tr>
+        <tr><td>Input dimension (after PE)</td><td><code>42</code></td><td>2 + 2 × 2 × 10 = 42</td></tr>
+        <tr><td>Hidden layers</td><td><code>4</code></td><td>Linear → ReLU stack</td></tr>
+        <tr><td>Hidden width</td><td><code>256</code></td><td>Each layer has 256 neurons</td></tr>
+        <tr><td>Output activation</td><td><code>Sigmoid</code></td><td>Constrains output to [0, 1]</td></tr>
+        <tr><td>Loss function</td><td><code>MSE</code></td><td>Mean Squared Error on normalized RGB</td></tr>
+        <tr><td>Optimizer</td><td><code>Adam</code></td><td>lr = 1e-2</td></tr>
+        <tr><td>Batch size</td><td><code>10,000 pixels</code></td><td>Randomly sampled per iteration</td></tr>
+        <tr><td>Training iterations</td><td><code>2,000</code></td><td>Main run; grid uses 1,000</td></tr>
+        <tr><td>Final PSNR (fox)</td><td><code>~28 dB</code></td><td>Well above perceptual quality threshold</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="highlight">
+    The key insight: raw <em>(u, v)</em> coordinates in [0,1] are too smooth for the MLP
+    to learn high-frequency content. Positional encoding maps each coordinate to
+    <strong>42 sinusoidal basis functions</strong>, giving the network the "vocabulary"
+    to represent fine textures like fur. Without it (L=4), the network can only recover
+    blurry low-frequency structure.
+  </div>
+</div>
+
+<!-- TRAINING PROGRESSION -->
+<div id="progression" class="section reveal" style="padding-top:3rem;">
+  <div class="section-label">Training Progression</div>
+  <h2 style="font-size:1.6rem; margin-bottom:1rem;">From noise to image</h2>
+</div>
+
+<div class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Test Image — Fox <span class="psnr-badge">~28 dB @ 2000 iters</span></div>
+    <div class="img-wrap">
+      <img src="part1_outputs/test_image_progression.png" class="img-full" alt="Fox training progression"/>
+      <p class="img-caption">Ground truth → Iter 1 → 100 → 250 → 500 → 1000 → 2000 &nbsp;|&nbsp; L=10, width=256, lr=1e-2</p>
+    </div>
+    <div class="grid-2" style="margin-top:1rem;">
+      <div class="img-wrap">
+        <img src="part1_outputs/test_image_psnr.png" class="img-full" alt="Fox PSNR curve"/>
+        <p class="img-caption">PSNR curve — fox image (2000 iters)</p>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:center; gap:1rem; padding:1rem;">
+        <p style="color:var(--muted); font-size:0.9rem; line-height:1.7;">
+          The network starts from a near-black output at iter 1. By iter 100 the
+          low-frequency structure (shape, rough color) emerges. Fine details like
+          fur texture and eye reflections appear around iter 500, with further
+          refinement through 2000 iterations.
+        </p>
+        <p style="color:var(--muted); font-size:0.9rem; line-height:1.7;">
+          The characteristic <strong>checkerboard artifact</strong> visible at iter 100
+          arises from random pixel sampling and the network fills in the sampled pixels
+          first before interpolating the rest.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot orange"></span> Own Image — Cat <span class="psnr-badge" style="background:rgba(240,168,75,0.1);border-color:rgba(240,168,75,0.25);color:var(--accent2);">~27 dB @ 2000 iters</span></div>
+    <div class="img-wrap">
+      <img src="part1_ops_run2/my_image_progression.png" class="img-full" alt="Cat training progression"/>
+      <p class="img-caption">Ground truth → Iter 1 → 100 → 250 → 500 → 1000 → 2000 &nbsp;|&nbsp; L=10, width=256</p>
+    </div>
+    <div class="highlight orange" style="margin-top:1rem;">
+      The cat image starts with a uniform <strong>yellow patch</strong> at iter 1 as
+      the network outputs the mean image color before learning any spatial structure.
+      The color saturation remains slightly desaturated at convergence, a common
+      artifact when the image has a dominant warm tone.
+    </div>
+    <div class="img-wrap" style="margin-top:1rem;">
+      <img src="part1_ops_run2/my_image_psnr.png" class="img-full" alt="Cat PSNR curve"/>
+      <p class="img-caption">PSNR curve — cat image (2000 iters)</p>
+    </div>
+  </div>
+</div>
+
+<!-- HYPERPARAMETER GRID -->
+<div id="grid" class="section reveal" style="padding-top:3rem;">
+  <div class="section-label">Hyperparameter Study</div>
+  <h2 style="font-size:1.6rem; margin-bottom:1rem;">2×2 Ablation Grid</h2>
+</div>
+
+<div class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Effect of L (PE frequency) and width — 1000 iterations each</div>
+    <div class="img-wrap">
+      <img src="part1_outputs/hyperparameter_grid.png" class="img-full" alt="2x2 hyperparameter grid"/>
+      <p class="img-caption">2×2 grid: L ∈ {4, 10} × width ∈ {64, 256} &nbsp;|&nbsp; 1000 iterations</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:1.5rem;">
+      <div>
+        <p style="font-family:var(--sans); font-weight:600; font-size:0.9rem; margin-bottom:0.5rem;">Effect of Positional Encoding (L)</p>
+        <p style="color:var(--muted); font-size:0.88rem; line-height:1.7;">
+          <strong>L=4</strong> caps at ~25 dB regardless of width. The encoding lacks
+          high-frequency basis functions, so fine details like fur texture are
+          fundamentally unrepresentable and the results are blurry regardless of
+          network capacity. <strong>L=10</strong> reaches ~26–28 dB with sharper
+          reconstruction.
+        </p>
+      </div>
+      <div>
+        <p style="font-family:var(--sans); font-weight:600; font-size:0.9rem; margin-bottom:0.5rem;">Effect of Width</p>
+        <p style="color:var(--muted); font-size:0.88rem; line-height:1.7;">
+          Width affects <em>model capacity</em>. Going from width=64 → 256 at L=10
+          gives ~2 dB gain (26 → 28 dB). At L=4 the width barely matters and the
+          bottleneck is the encoding, not the network size. <strong>Both L and
+          width matter, but L matters more.</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- Individual grid runs -->
+    <div class="grid-2" style="margin-top:1.5rem;">
+      <div class="img-wrap">
+        <img src="part1_outputs/L4_w64_progression.png" class="img-full" alt="L4 w64"/>
+        <p class="img-caption">L=4, width=64 — ~25 dB</p>
+      </div>
+      <div class="img-wrap">
+        <img src="part1_outputs/L4_w256_progression.png" class="img-full" alt="L4 w256"/>
+        <p class="img-caption">L=4, width=256 — ~25 dB</p>
+      </div>
+      <div class="img-wrap">
+        <img src="part1_outputs/L10_w64_progression.png" class="img-full" alt="L10 w64"/>
+        <p class="img-caption">L=10, width=64 — ~26 dB</p>
+      </div>
+      <div class="img-wrap">
+        <img src="part1_outputs/L10_w256_progression.png" class="img-full" alt="L10 w256"/>
+        <p class="img-caption">L=10, width=256 — ~28 dB ✦ best</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════════════
+     PART 2
+═══════════════════════════════════════════════════════════ -->
+<div class="section" id="part2">
+  <div class="section-label orange">Part Two</div>
+  <h2>Neural Radiance Field<br/>from Multi-view Images</h2>
+  <p class="section-intro">
+    We extend the 2D neural field to a full 3D NeRF, trained on 100 multi-view
+    images of the Lego bulldozer scene. A deeper MLP maps (x, y, z, dx, dy, dz)
+    → (r, g, b, σ), and volume rendering composites these predictions into
+    final pixel colors.
+  </p>
+</div>
+
+<!-- IMPLEMENTATION -->
+<div class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot orange"></span> Implementation Overview</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Ray Generation (Part 2.1–2.2)</strong>
+          <p>For every pixel (u+0.5, v+0.5) in each training image, we compute a ray
+          origin <code>r_o = c2w[:3,3]</code> and direction
+          <code>r_d = normalize(R @ K⁻¹ @ [u,v,1])</code>.
+          All rays across all 100 images are precomputed and stored as
+          <code>(N×H×W, 3)</code> tensors.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Point Sampling along Rays (Part 2.2)</strong>
+          <p>Each ray is discretized into <code>n_samples=64</code> points between
+          <code>near=2.0</code> and <code>far=6.0</code>. During training, random
+          jitter within each depth interval prevents the network from overfitting
+          to a fixed discrete sample grid.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>NeRF MLP Architecture (Part 2.4)</strong>
+          <p>An 8-layer MLP with a skip connection at layer 5. Input: 3D coords encoded
+          with L=10 (63-dim) + view direction encoded with L=4 (27-dim). Output:
+          density σ (ReLU ≥ 0) and color RGB (Sigmoid ∈ [0,1]).
+          The view-direction conditioning allows the network to represent
+          view-dependent effects like specular highlights.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Volume Rendering (Part 2.5)</strong>
+          <p>The discrete volume rendering equation composites point colors weighted
+          by transmittance T_i and opacity α_i = 1 - exp(-σ_i·δ_i).
+          Training: Adam optimizer, <code>lr=5e-4</code>, batch of 10K rays/step.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- RAY VISUALIZATION -->
+<div id="rays" class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot orange"></span> Ray & Sample Visualization — Viser</div>
+    <div class="img-wrap">
+      <img src="nerf_outputs/left_view.png" class="img-full" alt="Viser ray visualization"/>
+      <p class="img-caption">
+        100 training cameras (frustum thumbnails) arranged in a hemisphere ·
+        100 rays from one camera (black lines) · sample points along each ray (dots)
+      </p>
+    </div>
+    <div class="highlight orange" style="margin-top:1rem;">
+      All rays originate from the same camera and fan out towards the lego scene
+      in the center, confirming that the <code>image_to_rays()</code> implementation
+      correctly computes ray directions via <code>K⁻¹</code> unprojection and
+      <code>c2w</code> rotation. Sample points are uniformly distributed between
+      near=2.0 and far=6.0.
+    </div>
+  </div>
+</div>
+
+<!-- NERF TRAINING -->
+<div id="nerf-train" class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot orange"></span> Training Progression — Lego Scene <span class="psnr-badge" style="background:rgba(240,168,75,0.1);border-color:rgba(240,168,75,0.25);color:var(--accent2);">26.5 dB @ 5000 iters</span></div>
+    <div class="img-wrap">
+      <img src="nerf_outputs/nerf_progression.png" class="img-full" alt="NeRF training progression"/>
+      <p class="img-caption">Validation view rendered every 500 iterations · 5000 total gradient steps</p>
+    </div>
+    <div class="img-wrap" style="margin-top:1rem;">
+      <img src="nerf_outputs/val_psnr_curve.png" class="img-full" alt="Validation PSNR curve"/>
+      <p class="img-caption">Validation PSNR on 6 held-out views · target 23 dB crossed at ~800 iterations</p>
+    </div>
+    <div class="highlight orange" style="margin-top:1rem;">
+      The 23 dB full-credit target is crossed at approximately <strong>800 iterations</strong>.
+      Final PSNR of <strong>~26.5 dB</strong> at 5000 steps demonstrates the model
+      has learned accurate geometry and view-dependent appearance of the Lego bulldozer.
+    </div>
+  </div>
+</div>
+
+<!-- NOVEL VIEW GIF -->
+<div id="novel" class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot orange"></span> Spherical Novel-View Rendering — Lego</div>
+    <div class="gif-showcase">
+      <div class="gif-box" style="max-width:300px; margin:0 auto;">
+        <img src="nerf_outputs/lego_novel_view.gif" alt="Lego novel view GIF"/>
+        <div class="gif-label">60 test cameras · 15 fps · rendered after 5000 iters</div>
+      </div>
+      <div style="flex:1; min-width:220px; display:flex; flex-direction:column; justify-content:center; gap:1rem;">
+        <p style="color:var(--muted); font-size:0.9rem; line-height:1.75;">
+          The NeRF is evaluated at 60 cameras arranged in a sphere around the lego
+          scene (the <code>c2ws_test</code> cameras from the dataset). Each frame
+          is rendered by casting a full grid of rays and compositing with the
+          learned density and color fields.
+        </p>
+        <p style="color:var(--muted); font-size:0.9rem; line-height:1.75;">
+          The clean black background and consistent appearance across viewing angles
+          confirm that the model has correctly learned both the geometry (density
+          field) and view-dependent appearance (color field conditioned on ray
+          direction) of the scene.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════════════
+     PART 3 — EXTRA CREDIT
+═══════════════════════════════════════════════════════════ -->
+<div class="section" id="part3">
+  <div class="section-label purple">Part Three · Extra Credit</div>
+  <h2>NeRF on Real-World Data</h2>
+  <p class="section-intro">
+    Next I tried training NeRF on my own object with a smartphone, ran COLMAP to estimate camera
+    poses, and trained the same NeRF pipeline on the resulting dataset.
+    This tests whether the pipeline generalizes beyond synthetic data.
+  </p>
+</div>
+
+<div class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot purple"></span> Data Capture & Processing Pipeline</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Video Capture</strong>
+          <p>Recorded a ~35 second video (480×848, 30fps) walking a full circle around
+          a textured plush toy, keeping the object centered throughout. First frame
+          taken at eye-level pointing directly at the object.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Frame Extraction & COLMAP</strong>
+          <p>Used the provided Google Colab notebook to extract ~60 frames from the
+          video, run COLMAP Structure-from-Motion to estimate camera poses, and
+          undistort images using <code>cv2.undistort()</code> to match the pinhole
+          camera model assumed by NeRF.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Dataset Preparation</strong>
+          <p>Center-cropped and resized frames to 200×200. Saved as <code>.npz</code>
+          with <code>images_train</code>, <code>c2ws_train</code>, and <code>focal</code>.
+          Auto-split: last 5 images → validation, 60 circular test cameras generated
+          from average training camera radius.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Hyperparameter Changes for Real Data</strong>
+          <p>Used <code>near=2.0, far=6.0</code> (same as lego — confirmed working
+          via 100-iter debug run). Real scenes are harder than synthetic; PSNR
+          plateaus at ~20 dB, which is expected for real-world captures without
+          careful studio lighting or scene normalization.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot purple"></span> Training Progression — Plush Toy</div>
+    <div class="img-wrap">
+      <img src="toy_nerf_outputs/nerf_progression.png" class="img-full" alt="Toy NeRF training progression"/>
+      <p class="img-caption">Validation view rendered every 500 iterations · 5000 total gradient steps · near=2.0, far=6.0</p>
+    </div>
+    <div class="highlight purple" style="margin-top:1rem;">
+      The plush toy's white/grey shape becomes recognizable from iter 500 and
+      progressively sharpens through 5000 iterations. Real-world NeRF is
+      significantly harder than synthetic due to lighting inconsistencies,
+      motion blur, and imperfect COLMAP pose estimation.
+    </div>
+  </div>
+</div>
+
+<div class="reveal">
+  <div class="card">
+    <div class="card-title"><span class="dot purple"></span> Novel-View Orbit — Plush Toy</div>
+    <div class="gif-showcase">
+      <div class="gif-box" style="max-width:280px; margin:0 auto;">
+        <img src="toy_nerf_outputs/toy_novel_view.gif" alt="Toy novel view GIF"/>
+        <div class="gif-label">Auto-generated orbit · 60 frames · 15 fps</div>
+      </div>
+      <div style="flex:1; min-width:220px; display:flex; flex-direction:column; justify-content:center; gap:1rem;">
+        <p style="color:var(--muted); font-size:0.9rem; line-height:1.75;">
+          The orbit GIF is rendered using 60 automatically-generated circular
+          test cameras at the average training camera radius (~3.5 units from origin),
+          since the custom dataset has no pre-defined test cameras.
+        </p>
+        <p style="color:var(--muted); font-size:0.9rem; line-height:1.75;">
+          The warm brown/beige background and white object silhouette are clearly
+          visible, confirming the NeRF has learned a plausible 3D density field
+          despite the challenging real-world conditions. Final validation
+          PSNR ~20 dB.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  COMS 4732 · Computer Vision II · Homework 4 · Neural Radiance Fields
+</footer>
+
+<script>
+  // Scroll-triggered reveal animations
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(r => observer.observe(r));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,301 @@
+Downloading test image...
+Image loaded: (400, 400, 3)
+
+=== Part 1: Training 2D Neural Field ===
+Training on device: cpu
+Image shape: (400, 400, 3)
+Architecture: L=10, width=256, num_layers=4
+Iter     1 | MSE: 0.102001 | PSNR: 9.91 dB
+Iter   100 | MSE: 0.005403 | PSNR: 22.67 dB
+Iter   200 | MSE: 0.003870 | PSNR: 24.12 dB
+Iter   300 | MSE: 0.002898 | PSNR: 25.38 dB
+Iter   400 | MSE: 0.002416 | PSNR: 26.17 dB
+Iter   500 | MSE: 0.002165 | PSNR: 26.65 dB
+Iter   600 | MSE: 0.002208 | PSNR: 26.56 dB
+Iter   700 | MSE: 0.001930 | PSNR: 27.14 dB
+Iter   800 | MSE: 0.002020 | PSNR: 26.95 dB
+Iter   900 | MSE: 0.001984 | PSNR: 27.03 dB
+Iter  1000 | MSE: 0.001884 | PSNR: 27.25 dB
+Iter  1100 | MSE: 0.002023 | PSNR: 26.94 dB
+Iter  1200 | MSE: 0.001788 | PSNR: 27.48 dB
+Iter  1300 | MSE: 0.001713 | PSNR: 27.66 dB
+Iter  1400 | MSE: 0.002174 | PSNR: 26.63 dB
+Iter  1500 | MSE: 0.001907 | PSNR: 27.20 dB
+Iter  1600 | MSE: 0.001637 | PSNR: 27.86 dB
+Iter  1700 | MSE: 0.001624 | PSNR: 27.89 dB
+Iter  1800 | MSE: 0.001717 | PSNR: 27.65 dB
+Iter  1900 | MSE: 0.001556 | PSNR: 28.08 dB
+Iter  2000 | MSE: 0.001574 | PSNR: 28.03 dB
+Saved progression plot to test_image_progression.png
+Saved PSNR curve to test_image_psnr.png
+
+=== Part 1: Hyperparameter Grid ===
+
+==================================================
+Running: L=4, width=64
+Training on device: cpu
+Image shape: (400, 400, 3)
+Architecture: L=4, width=64, num_layers=4
+Iter     1 | MSE: 0.101652 | PSNR: 9.93 dB
+Iter   100 | MSE: 0.015363 | PSNR: 18.14 dB
+Iter   200 | MSE: 0.010189 | PSNR: 19.92 dB
+Iter   300 | MSE: 0.004780 | PSNR: 23.21 dB
+Iter   400 | MSE: 0.003749 | PSNR: 24.26 dB
+Iter   500 | MSE: 0.003291 | PSNR: 24.83 dB
+Iter   600 | MSE: 0.003269 | PSNR: 24.86 dB
+Iter   700 | MSE: 0.003003 | PSNR: 25.22 dB
+Iter   800 | MSE: 0.002839 | PSNR: 25.47 dB
+Iter   900 | MSE: 0.002520 | PSNR: 25.99 dB
+Iter  1000 | MSE: 0.002801 | PSNR: 25.53 dB
+Saved progression plot to L4_w64_progression.png
+Saved PSNR curve to L4_w64_psnr.png
+
+==================================================
+Running: L=4, width=256
+Training on device: cpu
+Image shape: (400, 400, 3)
+Architecture: L=4, width=256, num_layers=4
+Iter     1 | MSE: 0.098779 | PSNR: 10.05 dB
+Iter   100 | MSE: 0.009619 | PSNR: 20.17 dB
+Iter   200 | MSE: 0.003779 | PSNR: 24.23 dB
+Iter   300 | MSE: 0.003682 | PSNR: 24.34 dB
+Iter   400 | MSE: 0.002992 | PSNR: 25.24 dB
+Iter   500 | MSE: 0.002812 | PSNR: 25.51 dB
+Iter   600 | MSE: 0.002995 | PSNR: 25.24 dB
+Iter   700 | MSE: 0.002567 | PSNR: 25.91 dB
+Iter   800 | MSE: 0.002816 | PSNR: 25.50 dB
+Iter   900 | MSE: 0.002521 | PSNR: 25.98 dB
+Iter  1000 | MSE: 0.003011 | PSNR: 25.21 dB
+Saved progression plot to L4_w256_progression.png
+Saved PSNR curve to L4_w256_psnr.png
+
+==================================================
+Running: L=10, width=64
+Training on device: cpu
+Image shape: (400, 400, 3)
+Architecture: L=10, width=64, num_layers=4
+Iter     1 | MSE: 0.096965 | PSNR: 10.13 dB
+Iter   100 | MSE: 0.006065 | PSNR: 22.17 dB
+Iter   200 | MSE: 0.003458 | PSNR: 24.61 dB
+Iter   300 | MSE: 0.002871 | PSNR: 25.42 dB
+Iter   400 | MSE: 0.003187 | PSNR: 24.97 dB
+Iter   500 | MSE: 0.002800 | PSNR: 25.53 dB
+Iter   600 | MSE: 0.002573 | PSNR: 25.90 dB
+Iter   700 | MSE: 0.002591 | PSNR: 25.87 dB
+Iter   800 | MSE: 0.002463 | PSNR: 26.09 dB
+Iter   900 | MSE: 0.002372 | PSNR: 26.25 dB
+Iter  1000 | MSE: 0.002386 | PSNR: 26.22 dB
+Saved progression plot to L10_w64_progression.png
+Saved PSNR curve to L10_w64_psnr.png
+
+==================================================
+Running: L=10, width=256
+Training on device: cpu
+Image shape: (400, 400, 3)
+Architecture: L=10, width=256, num_layers=4
+Iter     1 | MSE: 0.101282 | PSNR: 9.94 dB
+Iter   100 | MSE: 0.004277 | PSNR: 23.69 dB
+Iter   200 | MSE: 0.002655 | PSNR: 25.76 dB
+Iter   300 | MSE: 0.002243 | PSNR: 26.49 dB
+Iter   400 | MSE: 0.002221 | PSNR: 26.53 dB
+Iter   500 | MSE: 0.001965 | PSNR: 27.07 dB
+Iter   600 | MSE: 0.002017 | PSNR: 26.95 dB
+Iter   700 | MSE: 0.001966 | PSNR: 27.06 dB
+Iter   800 | MSE: 0.001736 | PSNR: 27.60 dB
+Iter   900 | MSE: 0.001675 | PSNR: 27.76 dB
+Iter  1000 | MSE: 0.001554 | PSNR: 28.09 dB
+Saved progression plot to L10_w256_progression.png
+Saved PSNR curve to L10_w256_psnr.png
+Saved hyperparameter grid to hyperparameter_grid.png
+(venv) (base) sanskritibansal@Mac-1922 cv2_hw4 % 
+
+-------------------------------------------------------------------------------------
+
+(venv) (base) sanskritibansal@Sanskritis-MacBook-Air cv2_hw4 % python part1_nerf2d.py
+Using device: mps
+Loading test image from img/fox.jpg...
+Test image loaded: (400, 400, 3)
+
+=== Part 1: Training 2D Neural Field (test image) ===
+Training on device: mps
+Image shape: (400, 400, 3)
+Architecture: L=10, width=256, num_layers=4
+Iter     1 | MSE: 0.099025 | PSNR: 10.04 dB
+Iter   100 | MSE: 0.006618 | PSNR: 21.79 dB
+Iter   200 | MSE: 0.004913 | PSNR: 23.09 dB
+Iter   300 | MSE: 0.004342 | PSNR: 23.62 dB
+Iter   400 | MSE: 0.003793 | PSNR: 24.21 dB
+Iter   500 | MSE: 0.003451 | PSNR: 24.62 dB
+Iter   600 | MSE: 0.002394 | PSNR: 26.21 dB
+Iter   700 | MSE: 0.002726 | PSNR: 25.65 dB
+Iter   800 | MSE: 0.002503 | PSNR: 26.02 dB
+Iter   900 | MSE: 0.003894 | PSNR: 24.10 dB
+Iter  1000 | MSE: 0.002124 | PSNR: 26.73 dB
+Iter  1100 | MSE: 0.002167 | PSNR: 26.64 dB
+Iter  1200 | MSE: 0.002162 | PSNR: 26.65 dB
+Iter  1300 | MSE: 0.002128 | PSNR: 26.72 dB
+Iter  1400 | MSE: 0.002098 | PSNR: 26.78 dB
+Iter  1500 | MSE: 0.002097 | PSNR: 26.78 dB
+Iter  1600 | MSE: 0.002051 | PSNR: 26.88 dB
+Iter  1700 | MSE: 0.001880 | PSNR: 27.26 dB
+Iter  1800 | MSE: 0.002202 | PSNR: 26.57 dB
+Iter  1900 | MSE: 0.002006 | PSNR: 26.98 dB
+Iter  2000 | MSE: 0.002028 | PSNR: 26.93 dB
+Saved progression plot to test_image_progression.png
+Saved PSNR curve to test_image_psnr.png
+
+Loading own image from img/cat.jpg...
+Own image loaded: (400, 400, 3)
+
+=== Part 1: Training 2D Neural Field (own image) ===
+Training on device: mps
+Image shape: (400, 400, 3)
+Architecture: L=10, width=256, num_layers=4
+Iter     1 | MSE: 0.067816 | PSNR: 11.69 dB
+Iter   100 | MSE: 0.003914 | PSNR: 24.07 dB
+Iter   200 | MSE: 0.002775 | PSNR: 25.57 dB
+Iter   300 | MSE: 0.002611 | PSNR: 25.83 dB
+Iter   400 | MSE: 0.002423 | PSNR: 26.16 dB
+Iter   500 | MSE: 0.002347 | PSNR: 26.29 dB
+Iter   600 | MSE: 0.002285 | PSNR: 26.41 dB
+Iter   700 | MSE: 0.002248 | PSNR: 26.48 dB
+Iter   800 | MSE: 0.002246 | PSNR: 26.49 dB
+Iter   900 | MSE: 0.002108 | PSNR: 26.76 dB
+Iter  1000 | MSE: 0.002095 | PSNR: 26.79 dB
+Iter  1100 | MSE: 0.002159 | PSNR: 26.66 dB
+Iter  1200 | MSE: 0.002062 | PSNR: 26.86 dB
+Iter  1300 | MSE: 0.002036 | PSNR: 26.91 dB
+Iter  1400 | MSE: 0.002235 | PSNR: 26.51 dB
+Iter  1500 | MSE: 0.002078 | PSNR: 26.82 dB
+Iter  1600 | MSE: 0.002863 | PSNR: 25.43 dB
+Iter  1700 | MSE: 0.002036 | PSNR: 26.91 dB
+Iter  1800 | MSE: 0.002083 | PSNR: 26.81 dB
+Iter  1900 | MSE: 0.001923 | PSNR: 27.16 dB
+Iter  2000 | MSE: 0.002043 | PSNR: 26.90 dB
+Saved progression plot to my_image_progression.png
+Saved PSNR curve to my_image_psnr.png
+
+=== Part 1: Hyperparameter Grid ===
+
+==================================================
+Running: L=4, width=64
+Training on device: mps
+Image shape: (400, 400, 3)
+Architecture: L=4, width=64, num_layers=4
+Iter     1 | MSE: 0.098244 | PSNR: 10.08 dB
+Iter   100 | MSE: 0.013829 | PSNR: 18.59 dB
+Iter   200 | MSE: 0.008861 | PSNR: 20.52 dB
+Iter   300 | MSE: 0.004948 | PSNR: 23.06 dB
+Iter   400 | MSE: 0.003428 | PSNR: 24.65 dB
+Iter   500 | MSE: 0.003398 | PSNR: 24.69 dB
+Iter   600 | MSE: 0.003117 | PSNR: 25.06 dB
+Iter   700 | MSE: 0.002971 | PSNR: 25.27 dB
+Iter   800 | MSE: 0.002795 | PSNR: 25.54 dB
+Iter   900 | MSE: 0.004560 | PSNR: 23.41 dB
+Iter  1000 | MSE: 0.002624 | PSNR: 25.81 dB
+Saved progression plot to L4_w64_progression.png
+Saved PSNR curve to L4_w64_psnr.png
+
+==================================================
+Running: L=4, width=256
+Training on device: mps
+Image shape: (400, 400, 3)
+Architecture: L=4, width=256, num_layers=4
+Iter     1 | MSE: 0.099287 | PSNR: 10.03 dB
+Iter   100 | MSE: 0.013045 | PSNR: 18.85 dB
+Iter   200 | MSE: 0.004700 | PSNR: 23.28 dB
+Iter   300 | MSE: 0.003773 | PSNR: 24.23 dB
+Iter   400 | MSE: 0.002929 | PSNR: 25.33 dB
+Iter   500 | MSE: 0.002946 | PSNR: 25.31 dB
+Iter   600 | MSE: 0.003021 | PSNR: 25.20 dB
+Iter   700 | MSE: 0.002940 | PSNR: 25.32 dB
+Iter   800 | MSE: 0.002547 | PSNR: 25.94 dB
+Iter   900 | MSE: 0.002558 | PSNR: 25.92 dB
+Iter  1000 | MSE: 0.002829 | PSNR: 25.48 dB
+Saved progression plot to L4_w256_progression.png
+Saved PSNR curve to L4_w256_psnr.png
+
+==================================================
+Running: L=10, width=64
+Training on device: mps
+Image shape: (400, 400, 3)
+Architecture: L=10, width=64, num_layers=4
+Iter     1 | MSE: 0.098216 | PSNR: 10.08 dB
+Iter   100 | MSE: 0.008202 | PSNR: 20.86 dB
+Iter   200 | MSE: 0.004021 | PSNR: 23.96 dB
+Iter   300 | MSE: 0.002991 | PSNR: 25.24 dB
+Iter   400 | MSE: 0.003556 | PSNR: 24.49 dB
+Iter   500 | MSE: 0.002716 | PSNR: 25.66 dB
+Iter   600 | MSE: 0.002628 | PSNR: 25.80 dB
+Iter   700 | MSE: 0.002625 | PSNR: 25.81 dB
+Iter   800 | MSE: 0.002370 | PSNR: 26.25 dB
+Iter   900 | MSE: 0.002289 | PSNR: 26.40 dB
+Iter  1000 | MSE: 0.002210 | PSNR: 26.56 dB
+Saved progression plot to L10_w64_progression.png
+Saved PSNR curve to L10_w64_psnr.png
+
+==================================================
+Running: L=10, width=256
+Training on device: mps
+Image shape: (400, 400, 3)
+Architecture: L=10, width=256, num_layers=4
+Iter     1 | MSE: 0.100457 | PSNR: 9.98 dB
+Iter   100 | MSE: 0.005390 | PSNR: 22.68 dB
+Iter   200 | MSE: 0.002531 | PSNR: 25.97 dB
+Iter   300 | MSE: 0.002276 | PSNR: 26.43 dB
+Iter   400 | MSE: 0.002275 | PSNR: 26.43 dB
+Iter   500 | MSE: 0.002152 | PSNR: 26.67 dB
+Iter   600 | MSE: 0.001853 | PSNR: 27.32 dB
+Iter   700 | MSE: 0.001783 | PSNR: 27.49 dB
+Iter   800 | MSE: 0.001701 | PSNR: 27.69 dB
+Iter   900 | MSE: 0.001686 | PSNR: 27.73 dB
+Iter  1000 | MSE: 0.001613 | PSNR: 27.92 dB
+Saved progression plot to L10_w256_progression.png
+Saved PSNR curve to L10_w256_psnr.png
+Saved hyperparameter grid to hyperparameter_grid.png
+(venv) (base) sanskritibansal@Sanskritis-MacBook-Air cv2_hw4 % 
+
+
+----------------------------------------------------------------------------------
+
+(venv) (base) sanskritibansal@Sanskritis-MacBook-Air cv2_hw4 % python part2_nerf3d.py
+Using device: mps
+Training NeRF on device: mps
+Train: (100, 200, 200, 3), Val: (10, 200, 200, 3)
+Precomputing training rays...
+Total training rays: 4000000
+NeRF parameters: 530,052
+Iter     1 | Loss: 0.199941 | Train PSNR: 6.99 dB
+Iter   100 | Loss: 0.056055 | Train PSNR: 12.51 dB
+Iter   200 | Loss: 0.013744 | Train PSNR: 18.62 dB
+Iter   300 | Loss: 0.010448 | Train PSNR: 19.81 dB
+Iter   400 | Loss: 0.008600 | Train PSNR: 20.66 dB
+Iter   500 | Loss: 0.006905 | Train PSNR: 21.61 dB
+  → Computing validation PSNR at iter 500...
+  → Val PSNR (avg over 6 images): 21.94 dB
+  → Saved checkpoint to nerf_outputs/nerf_model.pth
+Iter   600 | Loss: 0.006602 | Train PSNR: 21.80 dB
+Iter   700 | Loss: 0.005630 | Train PSNR: 22.50 dB
+Iter   800 | Loss: 0.004816 | Train PSNR: 23.17 dB
+Iter   900 | Loss: 0.005216 | Train PSNR: 22.83 dB
+Iter  1000 | Loss: 0.004600 | Train PSNR: 23.37 dB
+  → Computing validation PSNR at iter 1000...
+  → Val PSNR (avg over 6 images): 24.10 dB
+  → Saved checkpoint to nerf_outputs/nerf_model.pth
+Saved PSNR curve
+Rendering novel-view GIF from test cameras...
+Saved novel-view GIF to nerf_outputs/lego_novel_view.gif
+Saved final model to nerf_outputs/nerf_model.pth
+(venv) (base) sanskritibansal@Sanskritis-MacBook-Air cv2_hw4 % python visualise_viser.py
+UVs assertion passed!
+╭────── viser (listening *:8080) ───────╮
+│             ╷                         │
+│   HTTP      │ http://localhost:8080   │
+│   Websocket │ ws://localhost:8080     │
+│             ╵                         │
+╰───────────────────────────────────────╯
+(viser) Share URL requested!
+(viser) Generated share URL (expires in 24 hours, max 16 clients): https://object-f.share.viser.studio
+Viser server running on port 8080. Press Ctrl+C to stop.
+(viser) Connection opened (0, 1 total), 612 persistent messages
+(viser) Connection closed (0, 0 total)
