@@ -1,4 +1,4 @@
-# HW4 — Neural Radiance Fields
+# Neural Radiance Fields
 ### COMS 4732: Computer Vision II
 
 > Fitting a 2D neural field to a single image, then scaling up to a full 3D Neural Radiance Field (NeRF) trained from multi-view photographs.
